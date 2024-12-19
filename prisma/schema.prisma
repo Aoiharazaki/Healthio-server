@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Todo {
+  id Int @id @default(autoincrement())
+  title String
+  isCompleted Boolean @default(false)
+}
+
+model Shop {
+  id Int @id @default(autoincrement())
+  name String
+  location Location? @relation(fields: [locationId], references: [id])
+  locationId Int?
+  description String? 
+  genre Genre? @relation(fields: [genreId], references: [id])
+  genreId Int?
+  photos Photo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Photo {
+  id Int @id @default(autoincrement())
+  url String
+  shopId Int
+  shop Shop @relation(fields: [shopId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Genre {
+  id Int @id @default(autoincrement())
+  name String @unique
+  shops Shop[]
+  createdAt DateTime @default(now())
+}
+
+model Location {
+  id Int @id @default(autoincrement())
+  name String @unique
+  shops Shop[]
+  createdAt DateTime @default(now())
+}
+
+
