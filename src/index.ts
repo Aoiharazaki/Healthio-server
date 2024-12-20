@@ -14,8 +14,6 @@ app.get("/allTodos", async (req: Request, res: Response) => {
     const allTodos = await prisma.todo.findMany();
     return res.json(allTodos);
 });
-
-
 app.post("/createTodo", async (req: Request, res: Response) => {
     const { title, isCompleted } = req.body;
     const createTodo = await prisma.todo.create({
@@ -26,9 +24,6 @@ app.post("/createTodo", async (req: Request, res: Response) => {
     });
     return res.json(createTodo);
 });
-
-
-
 app.put("/editTodo/:id", async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const { title, isCompleted } = req.body;
@@ -41,7 +36,6 @@ app.put("/editTodo/:id", async (req: Request, res: Response) => {
     });
     return res.json(editTodo);
 });
-
 app.delete("/deleteTodo/:id", async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const deleteTodo = await prisma.todo.delete({
@@ -55,84 +49,35 @@ app.delete("/deleteTodo/:id", async (req: Request, res: Response) => {
 app.get("/allShops", async (req: Request, res: Response) => {
     const allShops = await prisma.shop.findMany({
         include: {
-            location: true, // locationId に紐づく location を取得
-            genre: true,    // genreId に紐づく genre を取得
-            photos:true,
+            location: true, 
+            genre: true,
+            photos: true,
         },
     });
     return res.json(allShops);
 });
 
+app.get("/shop/:id", async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    try {
+        const shop = await prisma.shop.findUnique({
+            where: {id},
+            include: {
+                location: true, 
+                genre: true,
+                photos: true,
+            },
+        });
+        if (!shop) {
+            return res.status(404).json({ message: "お店が見つかりませんでした。" });
+        }
+        return res.json(shop);
+    } catch (error) {
+        console.error("エラー:", error);
+        return res.status(500).json({ message: "サーバーエラーが発生しました。" });
+    }
+});
 
-// app.post("/createShop", async (req: Request, res: Response) => {
-//     const { name,  } = req.body;
-//     const createTodo = await prisma.todo.create({
-//         data:{
-//             name,
-//             isCompleted,
-//         },
-//     });
-//     return res.json(createTodo);
-// });
-
-
-// app.post("/createShop", async (req: Request, res: Response) => {
-//     try {
-//         const {
-//             name,
-//             locationId, // LocationのID (オプショナル)
-//             description, // 説明 (オプショナル)
-//             genreId, // GenreのID (オプショナル)
-//             photos, // 写真のURLリスト (オプショナル)
-//         } = req.body;
-
-//         // `Shop` レコードを作成
-//         const createShop = await prisma.shop.create({
-//             data: {
-//                 name,
-//                 locationId, // NULL許可されているので、指定しなくてもOK
-//                 description,
-//                 genreId,
-//                 photos: {
-//                     create: photos?.map((url: string) => ({
-//                         url,
-//                     })) || [], // photosが存在する場合のみPhotoを作成
-//                 },
-//             },
-//             include: {
-//                 photos: true, // 作成したPhotoも含めて返す
-//             },
-//         });
-
-//         return res.json(createShop);
-//     } catch (error) {
-//         console.error("Error creating shop:", error);
-//         return res.status(500).json({ error: "Failed to create shop" });
-//     }
-// });
-
-
-
-// app.put("/editShop/:id", async (req: Request, res: Response) => {
-//     const id = Number(req.params.id);
-//     const { title, isCompleted } = req.body;
-//     const editTodo = await prisma.todo.update({
-//         where: { id },
-//         data:{
-//             title,
-//             isCompleted,
-//         },
-//     });
-//     return res.json(editTodo);
-// });
-
-// app.delete("/deleteShop/:id", async (req: Request, res: Response) => {
-//     const id = Number(req.params.id);
-//     const deleteTodo = await prisma.todo.delete({
-//         where: { id },
-//     });
-//     return res.json(deleteTodo);
-// });
 
 
 
